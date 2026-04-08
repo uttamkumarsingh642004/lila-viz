@@ -2,7 +2,7 @@
 
 An interactive web tool for visualizing 5 days of gameplay telemetry from LILA BLACK, an extraction shooter. Built as a take-home assignment for Lila Games.
 
-**Live demo:** [https://lila-viz.vercel.app](https://lila-viz.vercel.app)
+**Live demo:** [https://lila-viz-xi.vercel.app](https://lila-viz-xi.vercel.app)
 
 ---
 
