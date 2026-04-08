@@ -101,6 +101,7 @@ export default function Sidebar({
               key={type}
               label={label}
               color={color}
+              eventType={type}
               checked={visibleTypes.has(type)}
               onChange={() => onTypeToggle(type)}
             />
@@ -161,11 +162,9 @@ export default function Sidebar({
               <svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#64748b" strokeWidth="1.5" strokeDasharray="4 3" /></svg>
               Bot path
             </div>
-            {Object.entries(EVENT_STYLES).map(([type, { color, label }]) => (
+            {Object.entries(EVENT_STYLES).map(([type, { label }]) => (
               <div key={type} className="flex items-center gap-2">
-                <svg width="14" height="14" viewBox="-7 -7 14 14">
-                  <circle r="6" fill={color} fillOpacity="0.3" stroke={color} strokeWidth="1" />
-                </svg>
+                <EventIcon type={type} size={14} />
                 {label}
               </div>
             ))}
@@ -201,7 +200,7 @@ function Select({ value, onChange, options, placeholder }) {
   )
 }
 
-function CheckRow({ label, color, checked, onChange }) {
+function CheckRow({ label, color, checked, onChange, eventType }) {
   return (
     <label className="flex items-center gap-2 cursor-pointer group py-0.5">
       <input
@@ -210,13 +209,57 @@ function CheckRow({ label, color, checked, onChange }) {
         onChange={e => onChange(e.target.checked)}
         className="accent-indigo-500"
       />
-      <span
-        className="w-2 h-2 rounded-full flex-none"
-        style={{ background: color }}
-      />
+      <EventIcon type={eventType} size={14} />
       <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors">{label}</span>
     </label>
   )
+}
+
+/** Renders the same symbol used on the map, scaled for the sidebar. */
+function EventIcon({ type, size = 14 }) {
+  const half = size / 2
+  const r = half * 0.85
+
+  if (type === 'kill') {
+    return (
+      <svg width={size} height={size} viewBox={`${-half} ${-half} ${size} ${size}`} style={{ flexShrink: 0 }}>
+        <circle r={r} fill="#ef444440" stroke="#ef4444" strokeWidth={1.2} />
+        <line x1={0} y1={-r * 0.65} x2={0} y2={r * 0.65} stroke="#ef4444" strokeWidth={1.5} strokeLinecap="round" />
+        <line x1={-r * 0.65} y1={0} x2={r * 0.65} y2={0} stroke="#ef4444" strokeWidth={1.5} strokeLinecap="round" />
+      </svg>
+    )
+  }
+  if (type === 'death') {
+    return (
+      <svg width={size} height={size} viewBox={`${-half} ${-half} ${size} ${size}`} style={{ flexShrink: 0 }}>
+        <line x1={-r * 0.6} y1={-r * 0.6} x2={r * 0.6} y2={r * 0.6} stroke="#1e293b" strokeWidth={2.5} strokeLinecap="round" />
+        <line x1={r * 0.6}  y1={-r * 0.6} x2={-r * 0.6} y2={r * 0.6} stroke="#1e293b" strokeWidth={2.5} strokeLinecap="round" />
+        <line x1={-r * 0.6} y1={-r * 0.6} x2={r * 0.6} y2={r * 0.6} stroke="#f1f5f9" strokeWidth={1.5} strokeLinecap="round" />
+        <line x1={r * 0.6}  y1={-r * 0.6} x2={-r * 0.6} y2={r * 0.6} stroke="#f1f5f9" strokeWidth={1.5} strokeLinecap="round" />
+      </svg>
+    )
+  }
+  if (type === 'loot') {
+    const d = r * 0.75
+    return (
+      <svg width={size} height={size} viewBox={`${-half} ${-half} ${size} ${size}`} style={{ flexShrink: 0 }}>
+        <polygon points={`0,${-d} ${d},0 0,${d} ${-d},0`} fill="#eab308" fillOpacity={0.9} stroke="#fde68a" strokeWidth={0.8} />
+      </svg>
+    )
+  }
+  if (type === 'storm_death') {
+    return (
+      <svg width={size} height={size} viewBox={`${-half} ${-half} ${size} ${size}`} style={{ flexShrink: 0 }}>
+        <polygon
+          points={`1.5,${-r} -1.5,0 1.5,0 -1.5,${r} 3.5,0 0,0 3.5,${-r}`}
+          fill="#a855f7"
+          stroke="#d8b4fe"
+          strokeWidth={0.4}
+        />
+      </svg>
+    )
+  }
+  return <span style={{ width: size, height: size, display: 'inline-block' }} />
 }
 
 function ToggleRow({ label, checked, onChange }) {
