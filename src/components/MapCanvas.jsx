@@ -69,21 +69,10 @@ export default function MapCanvas({
       ref={containerRef}
       className="relative flex-1 overflow-hidden bg-gray-950 flex items-center justify-center"
     >
-      {/* Empty state: no map selected */}
-      {!mapId && (
+      {/* Empty state: no match selected yet (map image still shows in background) */}
+      {noMatch && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <div className="text-center">
-            <div className="text-5xl mb-4">🗺️</div>
-            <p className="text-lg font-semibold text-gray-400">Select a map to begin</p>
-            <p className="text-sm text-gray-600 mt-1">Use the buttons above or the sidebar</p>
-          </div>
-        </div>
-      )}
-
-      {/* Empty state: map selected but no match yet */}
-      {mapId && noMatch && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="text-center text-gray-600">
             <div className="text-4xl mb-3">📋</div>
             <p className="text-lg font-medium text-gray-500">Select a match to begin</p>
             <p className="text-sm text-gray-600 mt-1">Choose a date and match from the sidebar</p>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { MAP_DISPLAY, EVENT_STYLES, HEATMAP_MODES } from '../utils/constants.js'
+import { MAP_DISPLAY, EVENT_STYLES, HEATMAP_MODES, PLAYER_COLORS } from '../utils/constants.js'
 
 /**
  * Left sidebar with all filter controls.
@@ -177,9 +177,14 @@ export default function Sidebar({
         {/* ── Legend ── */}
         <Section label="Legend">
           <div className="space-y-1 text-xs text-gray-400">
+            {/* Human paths — each player gets a unique color from the palette */}
             <div className="flex items-center gap-2">
-              <svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#3b82f6" strokeWidth="2" /></svg>
-              Human path
+              <svg width="20" height="10">
+                {PLAYER_COLORS.slice(0, 5).map((c, i) => (
+                  <line key={c} x1={i * 4} y1="5" x2={i * 4 + 3} y2="5" stroke={c} strokeWidth="2.5" strokeLinecap="round" />
+                ))}
+              </svg>
+              Human path (per player)
             </div>
             <div className="flex items-center gap-2">
               <svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#64748b" strokeWidth="1.5" strokeDasharray="4 3" /></svg>
@@ -293,10 +298,11 @@ function ToggleRow({ label, checked, onChange }) {
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative w-8 h-4 rounded-full transition-colors ${checked ? 'bg-indigo-600' : 'bg-gray-600'}`}
+        className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-indigo-600' : 'bg-gray-600'}`}
       >
+        {/* Dot: explicit left-0.5 anchor so OFF=left, ON=right with even 2px margins */}
         <span
-          className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${checked ? 'translate-x-4' : 'translate-x-0.5'}`}
+          className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${checked ? 'translate-x-4' : 'translate-x-0'}`}
         />
       </button>
     </label>

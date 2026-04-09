@@ -11,7 +11,7 @@ export default function App() {
   const { meta, loading: metaLoading, error: metaError } = useMetadata()
 
   // ── Filter state ──────────────────────────────────────────────────────────
-  const [selectedMap,   setSelectedMap]   = useState('')   // no eager load on startup
+  const [selectedMap,   setSelectedMap]   = useState('AmbroseValley')
   const [selectedDate,  setSelectedDate]  = useState('')   // '' = all dates
   const [selectedMatch, setSelectedMatch] = useState('')
 
@@ -62,8 +62,10 @@ export default function App() {
     }
   }, [dates, selectedDate])
 
-  // ── Map data (lazy per-map JSON fetch) ────────────────────────────────────
-  const { data: mapData, loading: mapLoading, error: mapError } = useMatchData(selectedMap)
+  // ── Map data — only fetch when user picks a match (avoids 2.9 MB eager load) ──
+  const { data: mapData, loading: mapLoading, error: mapError } = useMatchData(
+    selectedMatch ? selectedMap : null
+  )
 
   // ── Match data for the selected match ─────────────────────────────────────
   const matchData = useMemo(() => {
