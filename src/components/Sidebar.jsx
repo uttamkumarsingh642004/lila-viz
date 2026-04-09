@@ -177,14 +177,16 @@ export default function Sidebar({
         {/* ── Legend ── */}
         <Section label="Legend">
           <div className="space-y-1 text-xs text-gray-400">
-            {/* Human paths — each player gets a unique color from the palette */}
-            <div className="flex items-center gap-2">
-              <svg width="20" height="10">
-                {PLAYER_COLORS.slice(0, 5).map((c, i) => (
-                  <line key={c} x1={i * 4} y1="5" x2={i * 4 + 3} y2="5" stroke={c} strokeWidth="2.5" strokeLinecap="round" />
+            {/* Human paths — each player gets a unique stable color */}
+            <div className="flex items-start gap-2">
+              <div className="flex flex-col gap-0.5 mt-0.5 flex-shrink-0">
+                {[0, 2, 9, 7].map(idx => (
+                  <svg key={idx} width="20" height="4">
+                    <line x1="0" y1="2" x2="20" y2="2" stroke={PLAYER_COLORS[idx]} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
                 ))}
-              </svg>
-              Human path (per player)
+              </div>
+              <span>Human paths<br /><span className="text-gray-600">(unique color per player)</span></span>
             </div>
             <div className="flex items-center gap-2">
               <svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#64748b" strokeWidth="1.5" strokeDasharray="4 3" /></svg>
