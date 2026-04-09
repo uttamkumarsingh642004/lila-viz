@@ -39,7 +39,7 @@ An interactive web tool for visualizing 5 days of gameplay telemetry from LILA B
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/yourusername/lila-viz.git
+git clone https://github.com/uttamkumarsingh642004/lila-viz.git
 cd lila-viz
 npm install
 ```
