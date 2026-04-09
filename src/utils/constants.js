@@ -50,17 +50,6 @@ export const PLAYER_COLORS = [
   '#38bdf8', // sky
 ]
 
-// Heatmap gradient: cold (blue) -> warm (red)
-export const HEATMAP_GRADIENT = [
-  [0,   0,   0,   0],   // transparent
-  [0,   0, 255,  80],   // blue
-  [0, 255, 255, 120],   // cyan
-  [0, 255,   0, 160],   // green
-  [255,255,  0, 200],   // yellow
-  [255, 128, 0, 220],   // orange
-  [255,  0,  0, 240],   // red
-]
-
 export const HEATMAP_MODES = {
   off:     'Off',
   kills:   'Kill Zones',

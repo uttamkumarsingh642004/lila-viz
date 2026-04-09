@@ -108,8 +108,9 @@ function renderHeatmap(canvas, points) {
 
   for (let gy = 0; gy < GRID; gy++) {
     for (let gx = 0; gx < GRID; gx++) {
-      const val = grid[gy * GRID + gx] / maxVal
-      if (val < 0.01) continue
+      const raw = grid[gy * GRID + gx] / maxVal   // linear 0..1
+      if (raw < 0.003) continue                    // skip noise floor
+      const val = Math.sqrt(raw)                   // sqrt scale: makes sparse data visible
       const [r, g, b, a] = lerpColor(val)
 
       // Fill the grid cell in the output image
@@ -133,7 +134,7 @@ function renderHeatmap(canvas, points) {
   ctx.putImageData(imgData, 0, 0)
 }
 
-export default function HeatmapLayer({ events, pathPoints, mode, opacity, showBots, mapSize }) {
+export default function HeatmapLayer({ events, pathPoints, mode, opacity, showBots, mapSize, offsetLeft = 0, offsetTop = 0 }) {
   const canvasRef = useRef(null)
 
   // Derive the set of points to accumulate based on mode
@@ -173,7 +174,8 @@ export default function HeatmapLayer({ events, pathPoints, mode, opacity, showBo
       height={IMG_SIZE}
       style={{
         position:  'absolute',
-        inset:     0,
+        left:      offsetLeft,
+        top:       offsetTop,
         width:     mapSize?.width  || '100%',
         height:    mapSize?.height || '100%',
         opacity,

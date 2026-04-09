@@ -2,42 +2,10 @@
  * Coordinate utilities for LILA BLACK minimap visualization.
  *
  * Game world uses (x, z) for 2D position; y = elevation (ignored).
- * Minimap images are 1024x1024 px.
- *
- * Formula (from README, verified against real data):
- *   u       = (worldX - originX) / scale
- *   v       = (worldZ - originZ) / scale
- *   pixel_x = u * 1024
- *   pixel_y = (1 - v) * 1024     <- Y flipped (image origin top-left)
- *
- * JSON coords are already in pixel space [0, 1024].
- * We scale them to the actual rendered canvas size using a ratio.
+ * Minimap images are 1024x1024 px. JSON pixel coords are in [0, 1024]
+ * space and scaled at render time:  screenCoord = jsonPixel * ratio
+ * where  ratio = img.clientWidth / 1024  (kept current via ResizeObserver).
  */
-
-import { IMG_SIZE } from './constants.js'
-
-/**
- * Scale a pixel coordinate from the 1024-based JSON space
- * to the actual rendered element dimensions.
- *
- * @param {number} px  - pixel value in [0, 1024] from JSON
- * @param {number} ratio - renderedSize / IMG_SIZE
- */
-export function scaleCoord(px, ratio) {
-  return px * ratio
-}
-
-/**
- * Compute the scale ratio for a rendered image element.
- * Call this after the image has loaded and after any resize.
- *
- * @param {HTMLImageElement} imgEl
- * @returns {number} ratio = renderedWidth / IMG_SIZE
- */
-export function getImageRatio(imgEl) {
-  if (!imgEl) return 1
-  return imgEl.clientWidth / IMG_SIZE
-}
 
 /**
  * Format elapsed seconds as mm:ss string.

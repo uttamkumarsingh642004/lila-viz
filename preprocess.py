@@ -246,15 +246,19 @@ def build_metadata(df: pd.DataFrame) -> dict:
         duration_sec = int(match_end[match_id] - match_start[match_id])
         player_count = int((~match_df["is_bot"]).groupby(match_df["user_id"]).first().sum())
         bot_count    = int(match_df["is_bot"].groupby(match_df["user_id"]).first().sum())
+        # True if bots existed in the match even if no bot files are in the dataset
+        # (detected via BotKill / BotKilled / BotPosition events in the human player's file)
+        has_bot_events = bool(match_df["event"].isin(["BotKill", "BotKilled", "BotPosition"]).any())
 
         matches_by_map[map_id].append(match_id)
         matches_by_date[date].append(match_id)
         match_info[match_id] = {
-            "map_id":       map_id,
-            "date":         date,
-            "duration_sec": duration_sec,
-            "player_count": player_count,
-            "bot_count":    bot_count,
+            "map_id":         map_id,
+            "date":           date,
+            "duration_sec":   duration_sec,
+            "player_count":   player_count,
+            "bot_count":      bot_count,
+            "has_bot_events": has_bot_events,
         }
 
     return {

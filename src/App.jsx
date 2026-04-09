@@ -11,7 +11,7 @@ export default function App() {
   const { meta, loading: metaLoading, error: metaError } = useMetadata()
 
   // ── Filter state ──────────────────────────────────────────────────────────
-  const [selectedMap,   setSelectedMap]   = useState('AmbroseValley')
+  const [selectedMap,   setSelectedMap]   = useState('')   // no eager load on startup
   const [selectedDate,  setSelectedDate]  = useState('')   // '' = all dates
   const [selectedMatch, setSelectedMatch] = useState('')
 
@@ -72,6 +72,25 @@ export default function App() {
   }, [mapData, selectedMatch])
 
   const duration = matchData?.duration_sec || 0
+
+  // Aggregate heatmap data across all matches for current map (filtered by date)
+  const aggregateHeatmapEvents = useMemo(() => {
+    if (!mapData) return []
+    return Object.entries(mapData.matches)
+      .filter(([matchId]) => !selectedDate || meta?.match_info[matchId]?.date === selectedDate)
+      .flatMap(([_, m]) => m.events)
+  }, [mapData, selectedDate, meta])
+
+  const aggregateHeatmapPaths = useMemo(() => {
+    if (!mapData) return []
+    return Object.entries(mapData.matches)
+      .filter(([matchId]) => !selectedDate || meta?.match_info[matchId]?.date === selectedDate)
+      .flatMap(([_, m]) =>
+        Object.values(m.paths).flatMap(({ is_bot, points }) =>
+          points.map(p => ({ ...p, is_bot }))
+        )
+      )
+  }, [mapData, selectedDate, meta])
 
   // ── Playback ──────────────────────────────────────────────────────────────
   const { currentTime, playing, speed, toggle, seek, setSpeed } = usePlayback(duration)
@@ -181,6 +200,8 @@ export default function App() {
           showPaths={showPaths}
           heatmapMode={heatmapMode}
           heatmapOpacity={heatmapOpacity}
+          heatmapEvents={aggregateHeatmapEvents}
+          heatmapPaths={aggregateHeatmapPaths}
         />
       </div>
 

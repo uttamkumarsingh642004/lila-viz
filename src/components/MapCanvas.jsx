@@ -27,14 +27,17 @@ export default function MapCanvas({
   showPaths,
   heatmapMode,
   heatmapOpacity,
+  heatmapEvents,
+  heatmapPaths,
 }) {
   const imgRef       = useRef(null)
   const containerRef = useRef(null)
   const [ratio, setRatio]           = useState(1)
   const [mapSize, setMapSize]       = useState({ width: 0, height: 0 })
+  const [imgOffset, setImgOffset]   = useState({ left: 0, top: 0 })
   const [selectedEvent, setSelectedEvent] = useState(null)
 
-  // Compute ratio whenever the image or container resizes
+  // Compute ratio + image offset whenever the image or container resizes
   const updateRatio = useCallback(() => {
     const img = imgRef.current
     if (!img || !img.complete || img.naturalWidth === 0) return
@@ -42,6 +45,7 @@ export default function MapCanvas({
     const h = img.clientHeight
     setRatio(w / 1024)
     setMapSize({ width: w, height: h })
+    setImgOffset({ left: img.offsetLeft, top: img.offsetTop })
   }, [])
 
   useEffect(() => {
@@ -57,13 +61,6 @@ export default function MapCanvas({
   const paths      = matchData?.paths      || null
   const duration   = matchData?.duration_sec || 0
 
-  // Flatten all path points for traffic heatmap
-  const pathPoints = React.useMemo(() => {
-    if (!paths) return []
-    return Object.entries(paths).flatMap(([playerId, { is_bot, points }]) =>
-      points.map(p => ({ ...p, is_bot }))
-    )
-  }, [paths])
 
   const noMatch = !matchData
 
@@ -72,13 +69,24 @@ export default function MapCanvas({
       ref={containerRef}
       className="relative flex-1 overflow-hidden bg-gray-950 flex items-center justify-center"
     >
-      {/* Empty state */}
-      {noMatch && (
+      {/* Empty state: no map selected */}
+      {!mapId && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <div className="text-center">
+            <div className="text-5xl mb-4">🗺️</div>
+            <p className="text-lg font-semibold text-gray-400">Select a map to begin</p>
+            <p className="text-sm text-gray-600 mt-1">Use the buttons above or the sidebar</p>
+          </div>
+        </div>
+      )}
+
+      {/* Empty state: map selected but no match yet */}
+      {mapId && noMatch && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <div className="text-center text-gray-600">
-            <div className="text-4xl mb-3">🗺️</div>
+            <div className="text-4xl mb-3">📋</div>
             <p className="text-lg font-medium text-gray-500">Select a match to begin</p>
-            <p className="text-sm text-gray-600 mt-1">Choose a map, date, and match from the sidebar</p>
+            <p className="text-sm text-gray-600 mt-1">Choose a date and match from the sidebar</p>
           </div>
         </div>
       )}
@@ -96,15 +104,17 @@ export default function MapCanvas({
         />
       )}
 
-      {/* Heatmap canvas layer */}
+      {/* Heatmap canvas layer — aligned to image position, aggregate data across all matches */}
       {mapId && (
         <HeatmapLayer
-          events={events}
-          pathPoints={pathPoints}
+          events={heatmapEvents}
+          pathPoints={heatmapPaths}
           mode={heatmapMode}
           opacity={heatmapOpacity}
           showBots={showBots}
           mapSize={mapSize}
+          offsetLeft={imgOffset.left}
+          offsetTop={imgOffset.top}
         />
       )}
 
@@ -113,8 +123,8 @@ export default function MapCanvas({
         <svg
           style={{
             position: 'absolute',
-            left: imgRef.current ? imgRef.current.offsetLeft : 0,
-            top:  imgRef.current ? imgRef.current.offsetTop  : 0,
+            left: imgOffset.left,
+            top:  imgOffset.top,
             width:  mapSize.width,
             height: mapSize.height,
             overflow: 'visible',
@@ -145,8 +155,8 @@ export default function MapCanvas({
         <div
           style={{
             position: 'absolute',
-            left: imgRef.current ? imgRef.current.offsetLeft : 0,
-            top:  imgRef.current ? imgRef.current.offsetTop  : 0,
+            left: imgOffset.left,
+            top:  imgOffset.top,
             width:  mapSize.width,
             height: mapSize.height,
             pointerEvents: 'none',

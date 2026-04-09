@@ -87,7 +87,10 @@ export default function Sidebar({
                 { value: '', label: 'Select a match…' },
                 ...matches.map(m => ({
                   value: m.id,
-                  label: `${m.id.slice(0, 8)}… (${Math.round(m.info.duration_sec / 60)}m, ${m.info.player_count}P+${m.info.bot_count}B)`,
+                  label: `${m.id.slice(0, 8)}… (${Math.round(m.info.duration_sec / 60)}m, ${m.info.player_count}P${
+                    m.info.bot_count > 0 ? `+${m.info.bot_count}B` :
+                    m.info.has_bot_events ? '+bots' : ''
+                  })`,
                 }))
               ]}
             />
@@ -134,19 +137,39 @@ export default function Sidebar({
             ))}
           </div>
           {heatmapMode !== 'off' && (
-            <div className="mt-2">
-              <label className="text-xs text-gray-500 block mb-1">
-                Opacity {Math.round(heatmapOpacity * 100)}%
-              </label>
-              <input
-                type="range"
-                min={0.1}
-                max={1}
-                step={0.05}
-                value={heatmapOpacity}
-                onChange={e => onHeatmapOpacity(parseFloat(e.target.value))}
-                className="w-full"
-              />
+            <div className="mt-2 space-y-2">
+              {/* Opacity slider */}
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">
+                  Opacity {Math.round(heatmapOpacity * 100)}%
+                </label>
+                <input
+                  type="range"
+                  min={0.1}
+                  max={1}
+                  step={0.05}
+                  value={heatmapOpacity}
+                  onChange={e => onHeatmapOpacity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Color legend */}
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Density</p>
+                <div
+                  className="w-full h-2.5 rounded"
+                  style={{
+                    background:
+                      'linear-gradient(to right, #0000ff, #00ffff, #00ff00, #ffff00, #ff8000, #ff0000)',
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-0.5">
+                  <span>Low</span>
+                  <span>Med</span>
+                  <span>High</span>
+                </div>
+              </div>
             </div>
           )}
         </Section>

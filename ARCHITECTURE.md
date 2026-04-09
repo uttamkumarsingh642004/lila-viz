@@ -121,7 +121,7 @@ A `ResizeObserver` keeps the ratio current when the window is resized.
 | Map overlay approach | Three.js, Leaflet, deck.gl, SVG+Canvas | SVG `<polyline>` + Canvas heatmap on `<img>` | Zero external map library; coordinate math is trivial at this scale; no projection needed |
 | Heatmap implementation | heatmap.js (CDN), deck.gl HeatmapLayer, raw Canvas | Raw Canvas with 128×128 grid accumulation + 3-pass box blur | Full control over colors/opacity; no CDN; no bundle overhead |
 | Data loading strategy | All maps upfront, per-map lazy, per-match lazy | Per-map lazy (module-level JS cache) | Largest map (AV) is ~2.9 MB / ~900 KB gzipped — acceptable as one fetch; per-match would require 796 separate files |
-| State management | Redux, Zustand, React context, useState | React `useState` + `useReducer` patterns | ~10 pieces of filter state; no shared state across deep trees; external library would be overhead |
+| State management | Redux, Zustand, React context, useState | React `useState` in App.jsx (flat props drilling) | ~10 pieces of filter state; no shared state across deep trees; external library would be overhead |
 | Timestamp normalization | Keep absolute Unix seconds, normalize to match-relative | Normalize: store `ts_rel` (seconds from match start) | Timeline scrubber needs to start at 0; absolute values would mean scrubber starts at 1.77 billion |
 | Coordinate axis choice | Use (x, y), use (x, z) | Use (x, z) | `y` = elevation per README; `z` is the horizontal game-world depth axis |
 | Playback speed | Real-time only, fixed animation time, configurable multiplier | Configurable 1×/2×/5× multiplier on real elapsed time | Matches vary 13–890 seconds; 1× of a 14-minute match is unusably slow; 5× makes all matches watchable |
