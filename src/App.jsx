@@ -4,7 +4,8 @@ import MapCanvas from './components/MapCanvas.jsx'
 import Timeline from './components/Timeline.jsx'
 import { useMetadata, useMatchData } from './hooks/useMatchData.js'
 import { usePlayback } from './hooks/usePlayback.js'
-import { MAP_DISPLAY } from './utils/constants.js'
+import { MAP_DISPLAY, PLAYER_COLORS } from './utils/constants.js'
+import { colorIndex } from './utils/coords.js'
 
 export default function App() {
   // ── Metadata ──────────────────────────────────────────────────────────────
@@ -74,6 +75,18 @@ export default function App() {
   }, [mapData, selectedMatch])
 
   const duration = matchData?.duration_sec || 0
+
+  // Human players in current match with their assigned colors (for legend)
+  const humanPlayers = useMemo(() => {
+    if (!matchData?.paths) return []
+    return Object.entries(matchData.paths)
+      .filter(([, p]) => !p.is_bot)
+      .sort(([a], [b]) => a.localeCompare(b))   // stable sort by id
+      .map(([playerId], i) => ({
+        label: `Player ${i + 1}`,
+        color: PLAYER_COLORS[colorIndex(playerId, PLAYER_COLORS.length)],
+      }))
+  }, [matchData])
 
   // Aggregate heatmap data across all matches for current map (filtered by date)
   const aggregateHeatmapEvents = useMemo(() => {
@@ -190,6 +203,8 @@ export default function App() {
 
           heatmapOpacity={heatmapOpacity}
           onHeatmapOpacity={setHeatmapOpacity}
+
+          humanPlayers={humanPlayers}
         />
 
         {/* Map area */}

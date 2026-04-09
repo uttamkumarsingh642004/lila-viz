@@ -41,6 +41,7 @@ export default function Sidebar({
   showPaths, onShowPathsChange,
   heatmapMode, onHeatmapMode,
   heatmapOpacity, onHeatmapOpacity,
+  humanPlayers,
 }) {
   return (
     <aside className="w-56 flex-none flex flex-col bg-gray-900 border-r border-gray-700 overflow-hidden">
@@ -177,27 +178,54 @@ export default function Sidebar({
         {/* ── Legend ── */}
         <Section label="Legend">
           <div className="space-y-1 text-xs text-gray-400">
-            {/* Human paths — each player gets a unique stable color */}
-            <div className="flex items-start gap-2">
-              <div className="flex flex-col gap-0.5 mt-0.5 flex-shrink-0">
-                {[0, 2, 9, 7].map(idx => (
-                  <svg key={idx} width="20" height="4">
-                    <line x1="0" y1="2" x2="20" y2="2" stroke={PLAYER_COLORS[idx]} strokeWidth="2" strokeLinecap="round" />
+            {/* Human paths — show per-player colors when a match is loaded */}
+            {humanPlayers && humanPlayers.length > 0 ? (
+              humanPlayers.map((p, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <svg width="20" height="4" style={{ flexShrink: 0 }}>
+                    <line x1="0" y1="2" x2="20" y2="2" stroke={p.color} strokeWidth="2" strokeLinecap="round" />
                   </svg>
-                ))}
+                  <span>{p.label} path</span>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-start gap-2">
+                <div className="flex flex-col gap-0.5 mt-0.5 flex-shrink-0">
+                  {[0, 2, 9, 7].map(idx => (
+                    <svg key={idx} width="20" height="4">
+                      <line x1="0" y1="2" x2="20" y2="2" stroke={PLAYER_COLORS[idx]} strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  ))}
+                </div>
+                <span>Human paths<br /><span className="text-gray-600">(unique per player)</span></span>
               </div>
-              <span>Human paths<br /><span className="text-gray-600">(unique color per player)</span></span>
-            </div>
+            )}
+
+            {/* Bot path */}
             <div className="flex items-center gap-2">
-              <svg width="20" height="10"><line x1="0" y1="5" x2="20" y2="5" stroke="#64748b" strokeWidth="1.5" strokeDasharray="4 3" /></svg>
+              <svg width="20" height="10" style={{ flexShrink: 0 }}><line x1="0" y1="5" x2="20" y2="5" stroke="#64748b" strokeWidth="1.5" strokeDasharray="4 3" /></svg>
               Bot path
             </div>
-            {Object.entries(EVENT_STYLES).map(([type, { label }]) => (
-              <div key={type} className="flex items-center gap-2">
-                <EventIcon type={type} size={14} />
-                {label}
-              </div>
-            ))}
+
+            {/* Kill: two variants */}
+            <div className="flex items-center gap-2">
+              <EventIcon type="kill" size={14} />
+              Kill (by player)
+            </div>
+            <div className="flex items-center gap-2">
+              <EventIcon type="kill" size={14} color="#f97316" />
+              Kill (by bot)
+            </div>
+
+            {/* Other event types */}
+            {Object.entries(EVENT_STYLES)
+              .filter(([type]) => type !== 'kill')
+              .map(([type, { label }]) => (
+                <div key={type} className="flex items-center gap-2">
+                  <EventIcon type={type} size={14} />
+                  {label}
+                </div>
+              ))}
           </div>
         </Section>
       </div>
@@ -246,16 +274,17 @@ function CheckRow({ label, color, checked, onChange, eventType }) {
 }
 
 /** Renders the same symbol used on the map, scaled for the sidebar. */
-function EventIcon({ type, size = 14 }) {
+function EventIcon({ type, size = 14, color }) {
   const half = size / 2
   const r = half * 0.85
 
   if (type === 'kill') {
+    const c = color || '#ef4444'
     return (
       <svg width={size} height={size} viewBox={`${-half} ${-half} ${size} ${size}`} style={{ flexShrink: 0 }}>
-        <circle r={r} fill="#ef444440" stroke="#ef4444" strokeWidth={1.2} />
-        <line x1={0} y1={-r * 0.65} x2={0} y2={r * 0.65} stroke="#ef4444" strokeWidth={1.5} strokeLinecap="round" />
-        <line x1={-r * 0.65} y1={0} x2={r * 0.65} y2={0} stroke="#ef4444" strokeWidth={1.5} strokeLinecap="round" />
+        <circle r={r} fill={`${c}40`} stroke={c} strokeWidth={1.2} />
+        <line x1={0} y1={-r * 0.65} x2={0} y2={r * 0.65} stroke={c} strokeWidth={1.5} strokeLinecap="round" />
+        <line x1={-r * 0.65} y1={0} x2={r * 0.65} y2={0} stroke={c} strokeWidth={1.5} strokeLinecap="round" />
       </svg>
     )
   }

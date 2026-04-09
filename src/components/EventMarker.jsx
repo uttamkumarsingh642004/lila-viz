@@ -90,6 +90,8 @@ export default function EventMarkers({ events, currentTime, ratio, visibleTypes,
         if (!MarkerComp) return null
         const sx = ev.x * ratio
         const sy = ev.y * ratio
+        // Bot-sourced kill events render orange; human kills stay red
+        const killColor = (ev.event_type === 'kill' && ev.is_bot) ? '#f97316' : undefined
         return (
           <g
             key={`${ev.event_type}-${ev.player_id}-${ev.ts}-${i}`}
@@ -98,7 +100,7 @@ export default function EventMarkers({ events, currentTime, ratio, visibleTypes,
             style={{ cursor: 'pointer' }}
           >
             <circle r={10} fill="transparent" />  {/* larger hit area */}
-            <MarkerComp />
+            <MarkerComp color={killColor} />
           </g>
         )
       })}
