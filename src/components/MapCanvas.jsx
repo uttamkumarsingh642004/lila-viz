@@ -136,6 +136,7 @@ export default function MapCanvas({
             currentTime={currentTime}
             ratio={ratio}
             visible={showPaths}
+            showBots={showBots}
           />
           <g style={{ pointerEvents: 'all' }}>
             <EventMarkers

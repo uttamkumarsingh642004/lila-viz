@@ -10,11 +10,13 @@ import { colorIndex } from '../utils/coords.js'
  *
  * Only path points with ts <= currentTime are shown.
  */
-export default function PathLayer({ paths, currentTime, ratio, visible }) {
+export default function PathLayer({ paths, currentTime, ratio, visible, showBots }) {
   // useMemo must come before any conditional return (Rules of Hooks)
   const lines = useMemo(() => {
     if (!visible || !paths) return []
     return Object.entries(paths).map(([playerId, { is_bot, points }]) => {
+      // Respect the Show Bots toggle
+      if (is_bot && !showBots) return null
       // Filter points up to currentTime
       const visiblePts = points.filter(p => p.ts <= currentTime)
       if (visiblePts.length < 2) return null
@@ -29,7 +31,7 @@ export default function PathLayer({ paths, currentTime, ratio, visible }) {
 
       return { playerId, is_bot, pointStr, color }
     }).filter(Boolean)
-  }, [paths, currentTime, ratio, visible])
+  }, [paths, currentTime, ratio, visible, showBots])
 
   if (lines.length === 0) return null
 
